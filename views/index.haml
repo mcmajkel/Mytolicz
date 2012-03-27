@@ -1,0 +1,45 @@
+!!! html5
+%html
+	%head
+		
+		
+		%link(rel="stylesheet" href="css/bootstrap.min.css") 
+		%link(rel="stylesheet" href="css/bootstrap-responsive.min.css")
+		%meta(charset="utf-8")
+		%meta(name="viewport" content="width=device-width, initial-scale=1.0")
+		%title Myto 0.2
+
+	%body
+		.container
+			.page-header.offset4
+				%h1 Mytoobliczacz - v0.2
+				%small Płacenie jest spoko!
+			.row
+				.span4.offset4
+					%p
+						Klasyczny przeliczacz paliwa na żydogeldy. Do przeliczenia potrzebujemy ni mniej, ni więcej, a tylko podać liczbę dni, którą spędziliśmy w fantastycznym wehikule. Całą resztą zajmie się magia!
+			.row
+				.span4.offset4
+					%form.well.form-inline
+						%label{:for=>"dni"}
+							Dni:
+						%input.span3#dni{:type=>"number", :placeholder=>"liczba dni"}
+			.row
+				.span4.offset4
+					.alert.alert-success#wynik
+						%h1.wynik
+							0 zł                	
+		%script{:type => 'text/javascript', :src => 'https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js'}
+		:javascript
+			var box = $('#dni');
+			var wynik = $('#wynik');
+			(function () {
+			    wynik.hide();
+			    box.keyup(function () {
+			    	var dni = box.val();
+			        $.getJSON('oblicz/'+dni, function(data){
+			        	console.log(data);
+			        	wynik.html("<h1 align='right'>" + data + " zł</h1>").slideDown();
+			        });
+				    })
+				})();

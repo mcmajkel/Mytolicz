@@ -3,19 +3,19 @@ require 'haml'
 require 'json'
 
 class Obliczacz
-	def initialize(cenaPaliwa = 5.61, liczbaKilometrowWJednaStrone=8.8, amortyzacja=1.1)
+	def initialize(cenaPaliwa = 5.61, liczbaKilometrowWJednaStrone=8.8, amortyzacja=1.1, spalanie=10)
 		@cenaPaliwa = cenaPaliwa
 		@liczbaKilometrowWJednaStrone = liczbaKilometrowWJednaStrone
 		@amortyzacja = amortyzacja
+		@spalanie = spalanie
 	end
 	
-	def ustaw(dni)
-		@dni = dni
+	def dni(dni)
+		@dni = dni.to_i.abs
 	end
-	attr_accessor :cenaPaliwa, :wynik, :dni, :liczbaKilometrowWJednaStrone, :amortyzacja 
 
 	def wynik
-		return (((dni * liczbaKilometrowWJednaStrone * 2) / 19 * cenaPaliwa)*amortyzacja).round
+		return (((@dni * 2 * @liczbaKilometrowWJednaStrone * @spalanie) / 200 * @cenaPaliwa)*@amortyzacja).round
 	end
 end
 
@@ -29,7 +29,7 @@ class MyApp < Sinatra::Base
 	end  
 
 	get '/oblicz/:dni' do
-		@@oblicz.ustaw(params[:dni].to_i)
+		@@oblicz.dni(params[:dni])
 		content_type :json
 		@@oblicz.wynik.to_json
 	end

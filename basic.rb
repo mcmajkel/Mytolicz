@@ -3,10 +3,13 @@ require 'haml'
 require 'json'
 
 class Obliczacz
-	def initialize(dni, cenaPaliwa = 5.61, liczbaKilometrowWJednaStrone=8.8, amortyzacja=1.1)
+	def initialize(cenaPaliwa = 5.61, liczbaKilometrowWJednaStrone=8.8, amortyzacja=1.1)
 		@cenaPaliwa = cenaPaliwa
 		@liczbaKilometrowWJednaStrone = liczbaKilometrowWJednaStrone
 		@amortyzacja = amortyzacja
+	end
+	
+	def ustaw(dni)
 		@dni = dni
 	end
 	attr_accessor :cenaPaliwa, :wynik, :dni, :liczbaKilometrowWJednaStrone, :amortyzacja 
@@ -17,13 +20,17 @@ class Obliczacz
 end
 
 class MyApp < Sinatra::Base
+
+	#klasa tworzona raz, dostepna dla calej aplikacji
+	@@oblicz = Obliczacz.new()
+
 	get '/' do  
 	  haml :index  
 	end  
 
 	get '/oblicz/:dni' do
-		oblicz = Obliczacz.new(params[:dni].to_i)
+		@@oblicz.ustaw(params[:dni].to_i)
 		content_type :json
-		oblicz.wynik.to_json
+		@@oblicz.wynik.to_json
 	end
 end

@@ -1,0 +1,24 @@
+%html
+	%head		
+		%link(rel="stylesheet" href="css/bootstrap.min.css") 
+		%link(rel="stylesheet" href="css/bootstrap-responsive.min.css")
+		%meta(charset="utf-8")
+		%meta(name="viewport" content="width=device-width, initial-scale=1.0")
+		%title Myto 0.2
+	%body
+		.container
+			.page-header.offset3
+				%h1 
+					Mytoobliczacz - v0.2
+					%small Singing with Sinatra
+			.row
+				.span4.offset4
+					%p
+						Zmień parametry
+			.row
+				.span4.offset4
+					%form.well.form-inline{:method=>"post", :action=>"/change"}
+						%label{:for=>"dni"}
+							Km w jedną stronę:
+						%input.span3#kmwjedna{:type=>"number", :placeholder=>"Liczba kilometrów", :name=>"kmwjedna"}    
+						%input.btn-primary{:type=>"submit", :value=>"zatwierdz"}   	

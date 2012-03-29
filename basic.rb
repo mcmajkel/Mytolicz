@@ -1,13 +1,34 @@
 require 'sinatra' 
 require 'haml'
 require 'json'
+require 'nokogiri'
+
+class Dane
+	@@data = Nokogiri::XML(open('data.xml'))
+
+	def self.cena
+		@cena = @@data.xpath('//root/cena').text.to_f
+	end
+
+	def self.km
+		@km = @@data.xpath('//root/km').text.to_f
+	end
+
+	def self.spalanie
+		@spalanie = @@data.xpath('//root/spalanie').text.to_f
+	end
+
+	def self.amortyzacja
+		@amortyzacja = @@data.xpath('//root/amortyzacja').text.to_f
+	end
+end
 
 class Obliczacz
-	def initialize(cenaPaliwa = 5.61, liczbaKilometrowWJednaStrone=8.8, amortyzacja=1.1, spalanie=10)
-		@cenaPaliwa = cenaPaliwa
-		@liczbaKilometrowWJednaStrone = liczbaKilometrowWJednaStrone
-		@amortyzacja = amortyzacja
-		@spalanie = spalanie
+	def initialize()
+		@cenaPaliwa = Dane.cena
+		@liczbaKilometrowWJednaStrone = Dane.km
+		@amortyzacja = Dane.amortyzacja
+		@spalanie = Dane.spalanie
 	end
 	
 	def dni(dni)
@@ -15,7 +36,7 @@ class Obliczacz
 	end
 
 	def wynik
-		return (((@dni * 2 * @liczbaKilometrowWJednaStrone * @spalanie) / 200 * @cenaPaliwa)*@amortyzacja).round
+		(((@dni * 2 * @liczbaKilometrowWJednaStrone * @spalanie) / 200 * @cenaPaliwa)*@amortyzacja).round
 	end
 end
 
@@ -25,12 +46,21 @@ class MyApp < Sinatra::Base
 	@@oblicz = Obliczacz.new()
 
 	get '/' do  
-	  haml :index  
+	  	haml :index  
 	end  
 
 	get '/oblicz/:dni' do
 		@@oblicz.dni(params[:dni])
 		content_type :json
 		@@oblicz.wynik.to_json
+	end
+
+	get '/admin' do
+		haml :admin
+	end
+
+	post '/change' do
+		@@oblicz.liczbaKilometrowWJednaStrone(params[:kmwjedna])
+		redirect('/')
 	end
 end

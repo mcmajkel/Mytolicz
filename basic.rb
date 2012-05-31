@@ -54,13 +54,4 @@ class MyApp < Sinatra::Base
 		content_type :json
 		@@oblicz.wynik.to_json
 	end
-
-	get '/admin' do
-		haml :admin
-	end
-
-	post '/change' do
-		@@oblicz.liczbaKilometrowWJednaStrone(params[:kmwjedna])
-		redirect('/')
-	end
 end

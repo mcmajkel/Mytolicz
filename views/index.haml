@@ -37,7 +37,7 @@
 			    	var dni = box.val();
 			        $.getJSON('oblicz/'+dni, function(data){
 			        	console.log(data);
-			        	wynik.html("<h1 align='right'>" + data + " zł</h1>").slideDown();
+			        	wynik.html("<h1 class='wynik'>" + data + " zł</h1>").slideDown();
 			        });
 				    })
 				})();

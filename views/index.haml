@@ -8,10 +8,9 @@
 		%title Myto 0.2
 	%body
 		.container
-			.page-header.offset3
+			.page-header.offset4
 				%h1 
-					Mytoobliczacz - v0.2
-					%small Singing with Sinatra
+					Mytoobliczacz - v0.3
 			.row
 				.span4.offset4
 					%p
@@ -20,24 +19,80 @@
 				.span4.offset4
 					%form.well.form-inline
 						%label{:for=>"dni"}
-							Dni:
-						%input.span3#dni{:type=>"number", :placeholder=>"liczba dni"}
+							Dni podróży:
+						%input.span3#dni{:type=>"number", :placeholder=>"liczba dni", :value => 1}
+			.row
+				.span4.offset4
+					%form.well.form-inline
+						%label{:for=>"cena"}
+							Cena litra:
+						%input.span3#cena{:type=>"number", :placeholder=>"cena litra", :value => Dane.cena}
+							zł						
+			.row
+				.span4.offset4
+					%form.well.form-inline
+						%label{:for=>"km"}
+							Km w jedną stronę:
+						%input.span3#km{:type=>"number", :placeholder=>"kilometrów w jedną stronę", :value => Dane.km}
+			.row
+				.span4.offset4
+					%form.well.form-inline
+						%label{:for=>"liczba_osob"}
+							Osób:
+						%input.span3#liczba_osob{:type=>"number", :placeholder=>"liczba osób", :value => Dane.liczba_osob}
+			.row
+				.span4.offset4
+					%form.well.form-inline
+						%label{:for=>"powrot"}
+							Powrót:
+						%input.span3#powrot{:type=>"checkbox", :placeholder=>"powrót?", :checked => Dane.powrot?}
 			.row
 				.span4.offset4
 					.alert.alert-success#wynik
 						%h1.wynik
 							0 zł                	
 		%script{:type => 'text/javascript', :src => 'https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js'}
-		:javascript
-			var box = $('#dni');
-			var wynik = $('#wynik');
+:javascript	
+	var dozwolone_znaki = [];
+	var box = $('#dni'),
+					cena_bx = $('#cena'),
+					km_bx = $('#km'),
+					liczba_osob_bx = $('#liczba_osob'),
+					powrot_bx = $('#powrot'),
+					wynik = $('#wynik');
+
+	function przelicz() {
+			    	var dni = box.val(),
+						cena = cena_bx.val(),
+						km = km_bx.val(),
+						liczba_osob = liczba_osob_bx.val(),
+						powrot = powrot_bx.prop('checked'); 
+				        $.getJSON('oblicz/'+dni+'/'+cena+'/'+km+'/'+liczba_osob+'/'+powrot, function(data){
+				        	console.log(data);
+				        	wynik.html("<h1 class='wynik'>" + data + " zł</h1>").slideDown();
+				        });
+				}
+
+	function cyfry(e) {
+	    var k = e.which;	    
+	    if (!(dozwolone_znaki.indexOf(k)>=0))
+	        e.preventDefault();
+	}
+
+	function cyfry_przecinek(e) {
+		var k = e.which;	    
+	    if (!(dozwolone_znaki.indexOf(k)>=0 || k == 44))
+	        e.preventDefault();	
+	}
+	
+	box.bind("keypress keyup change", przelicz).keypress(cyfry);
+	cena_bx.bind("keypress keyup change", przelicz).keypress(cyfry_przecinek);
+	liczba_osob_bx.bind("keypress keyup change", przelicz).keypress(cyfry);
+	km_bx.bind("keypress keyup change", przelicz).keypress(cyfry_przecinek);
+	powrot_bx.bind("keypress keyup change", przelicz);
+
 			(function () {
 			    wynik.hide();
-			    box.keyup(function () {
-			    	var dni = box.val();
-			        $.getJSON('oblicz/'+dni, function(data){
-			        	console.log(data);
-			        	wynik.html("<h1 class='wynik'>" + data + " zł</h1>").slideDown();
-			        });
-				    })
+			    for (i = 48; i < 58; i++)
+			    dozwolone_znaki.push(i);
 				})();

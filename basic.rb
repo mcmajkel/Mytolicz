@@ -21,14 +21,32 @@ class Dane
 	def self.amortyzacja
 		@amortyzacja = @@data.xpath('//root/amortyzacja').text.to_f
 	end
+
+	def self.liczba_osob
+		@liczba_osob = @@data.xpath('//root/liczba_osob').text.to_i
+	end
+
+	def self.powrot?
+		@@data.xpath('//root/powrot').text.to_i == 1 ? true : false
+	end
 end
 
 class Obliczacz
+
 	def initialize()
 		@cenaPaliwa = Dane.cena
 		@liczbaKilometrowWJednaStrone = Dane.km
-		@amortyzacja = Dane.amortyzacja
 		@spalanie = Dane.spalanie
+		@powrot = Dane.powrot? ? 2 : 1
+		@liczba_osob = Dane.liczba_osob
+	end
+
+	def assign(params)
+		@cenaPaliwa = params[:cena].to_f
+		@dni = params[:dni].to_i
+		@liczbaKilometrowWJednaStrone = params[:km].to_f
+		@liczba_osob = params[:osob].to_i
+		@powrot = params[:powrot] == "true" ? 2 : 1
 	end
 	
 	def dni(dni)
@@ -36,7 +54,8 @@ class Obliczacz
 	end
 
 	def wynik
-		(((@dni * 2 * @liczbaKilometrowWJednaStrone * @spalanie) / 200 * @cenaPaliwa)*@amortyzacja).round
+		spalanie_na_odcinku = (@spalanie * @liczbaKilometrowWJednaStrone) / 100
+		koszt = @dni * spalanie_na_odcinku * @cenaPaliwa * @powrot/ @liczba_osob
 	end
 end
 
@@ -49,9 +68,9 @@ class MyApp < Sinatra::Base
 	  	haml :index  
 	end  
 
-	get '/oblicz/:dni' do
-		@@oblicz.dni(params[:dni])
+	get '/oblicz/:dni/:cena/:km/:osob/:powrot' do
+		@@oblicz.assign params
 		content_type :json
-		@@oblicz.wynik.to_json
+		@@oblicz.wynik.round.to_json
 	end
 end
